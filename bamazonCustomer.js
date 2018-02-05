@@ -48,7 +48,8 @@ function start() {
                     }
                 ])
                 .then(function(answer) {
-
+                        // save the total price for later display
+                        
                         for (var i = 0; i < results.length; i++) {
                             if (results[i].item_id == answer.whichProduct) {
                                 var chosenItem = results[i];
@@ -58,7 +59,7 @@ function start() {
                                 }
 
                                 if (results[i].stock_quantity > answer.howMany) {
-                                    console.log("Success! You're item will come in one week!")
+                                var total = parseFloat(((answer.whichProduct*answer.howMany)));     
                                     // set question mark syntax to set variables later.
                                     connection.query("UPDATE products SET ? WHERE ?", [
                                             {stock_quantity:(results[i].stock_quantity - answer.howMany) },
@@ -67,6 +68,7 @@ function start() {
                                         ],
                                         function (error) {
                                         if(err) throw err;
+                                        console.log("Success! You're total is " + total)
                                     }
                                     )
                             
