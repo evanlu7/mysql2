@@ -28,41 +28,51 @@ start();
 
 function start() {
     connection.query("SELECT * FROM products", function(err, results) {
-                if (err) throw err;
-                inquirer
-                    .prompt([{
-                            name: "whichProduct",
-                            type: "input",
-                            message: "What is the ID of the item you want to buy?",
-                        },
-                        {
-                            name: "howMany",
-                            type: "input",
-                            message: "How many of the product do you want to buy?",
-                            validate: function(value) {
-                                if (isNaN(value) === false) {
-                                    return true;
-                                }
-                                return false;
+            if (err) throw err;
+            inquirer
+                .prompt([{
+                        name: "whichProduct",
+                        type: "input",
+                        message: "What is the ID of the item you want to buy?",
+                    },
+                    {
+                        name: "howMany",
+                        type: "input",
+                        message: "How many of the product do you want to buy?",
+                        validate: function(value) {
+                            if (isNaN(value) === false) {
+                                return true;
                             }
+                            return false;
                         }
-                    ])
-                    .then(function(answer) {
-                        var chosenItem;
+                    }
+                ])
+                .then(function(answer) {
+
                         for (var i = 0; i < results.length; i++) {
-                            if (results[i].item_id === answer.whichProduct) {
-                                chosenItem = results[i].product_name;
-                            }
-                        }
-                        if (chosenItem.price < parseInt(answer.howMany * chosenItem.price)) {
-                            connection.query(
-                                "UPDATE products ")
-                        }
+                            if (results[i].item_id == answer.whichProduct) {
+                                var chosenItem = results[i];
+                                }
+                                if (results[i].stock_quantity < answer.howMany) {
+                                    console.log("Insufficient Quantity!")
+                                }
 
-                    })
-            })
+                                if (results[i].stock_quantity > answer.howMany) {
+                                    console.log("Success! You're item will come in one week!")
+                                    // set question mark syntax to set variables later.
+                                    connection.query("UPDATE products SET ? WHERE ?", [
+                                            {stock_quantity:(results[i].stock_quantity - answer.howMany) },
+                                            {item_id: results[i].item_id }
+
+                                        ],
+                                        function (error) {
+                                        if(err) throw err;
+                                    }
+                                    )
+                            
+                        }
+                    }
+
+                })
+    })
 }
-
-
-
-
